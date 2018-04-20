@@ -1,19 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
+    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="3"
     tools:context="com.pethoalpar.androidtesstwoocr.OpencvActivity">
 
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/java_camera_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+
+        android:layout_weight="2"
+        android:onClick="takePicture1">
 
 
     </org.opencv.android.JavaCameraView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="translatedText"
+            android:id="@+id/tv_translated"/>
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/img_original_"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+
+            android:src="@drawable/ic_action_camera"
+
+            android:contentDescription="@string/img_captured_content"
+            android:scaleType="centerInside" />
+
+        <ImageView
+            android:id="@+id/img_filtered_"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_action_camera"
+            android:paddingBottom="10dp"
+
+            android:contentDescription="@string/img_filtered_content"
+            android:scaleType="centerInside" />
+    </LinearLayout>
+
+
+</LinearLayout>

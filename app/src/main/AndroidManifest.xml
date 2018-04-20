@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.pethoalpar.androidtesstwoocr">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
     <uses-feature
         android:name="android.hardware.camera2"
         android:required="true"/>
@@ -12,7 +15,6 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18"/>
-
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
@@ -41,6 +43,12 @@
 
         <activity android:name=".OpencvActivity">
         </activity>
+        <activity android:name=".MainPage">
+        </activity>
+        <activity android:name=".PostData">
+        </activity>
+        
+
     </application>
 
 </manifest>
