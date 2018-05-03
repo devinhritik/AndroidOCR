@@ -1,110 +1,116 @@
-//package com.pethoalpar.androidtesstwoocr;
-//
-//import android.os.AsyncTask;
-//import android.util.Log;
-//
-//import org.json.JSONObject;
-//
-//import java.io.BufferedReader;
-//import java.io.BufferedWriter;
-//import java.io.InputStreamReader;
-//import java.io.OutputStream;
-//import java.io.OutputStreamWriter;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
-//import java.net.URLEncoder;
-//import java.util.Iterator;
-//
-//import javax.net.ssl.HttpsURLConnection;
-//
-///**
-// * Created by Speed on 20/04/2018.
-// */
-//
-//public class TranslationUtils extends AsyncTask<String, Void, String> {
-//
-//    private String translatedStr = "Still no result";
-//
-//    protected void onPreExecute() {
-//    }
-//
-//    protected String doInBackground(String... arg0) {
-//        String name = arg0[0];
-//
-//        try {
-//
-//            //URL url = new URL("https://script.google.com/macros/s/AKfycbwht8Fh8CMY4qmCgThl3hXZb-bLoCsX3jEWOae4LKMe/dev");
-//            URL url = new URL("https://script.google.com/macros/s/AKfycbzLF-oc6IaPnwTzJsWqDgrl0KOT7gFF0e_KIffv1nprvhHKIko/exec");
-//            // https://script.google.com/macros/s/AKfycbyuAu6jWNYMiWt9X5yp63-hypxQPlg5JS8NimN6GEGmdKZcIFh0/exec
-//            JSONObject postDataParams = new JSONObject();
-//
-//            //int i;
-//            //for(i=1;i<=70;i++)
-//
-//
-//            //    String usn = Integer.toString(i);
-//
-//
-//            postDataParams.put("name", name);
-//
-//
-//            Log.e("params", postDataParams.toString());
-//
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//            conn.setReadTimeout(15000 /* milliseconds */);
-//            conn.setConnectTimeout(15000 /* milliseconds */);
-//            conn.setRequestMethod("POST");
-//            conn.setDoInput(true);
-//            conn.setDoOutput(true);
-//
-//            OutputStream os = conn.getOutputStream();
-//            BufferedWriter writer = new BufferedWriter(
-//                    new OutputStreamWriter(os, "UTF-8"));
-//            writer.write(getPostDataString(postDataParams));
-//
-//            writer.flush();
-//            writer.close();
-//            os.close();
-//
-//            int responseCode = conn.getResponseCode();
-//
-//            if (responseCode == HttpsURLConnection.HTTP_OK) {
-//
-//                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//                StringBuffer sb = new StringBuffer("");
-//                String line = "";
-//
-//                while ((line = in.readLine()) != null) {
-//
-//                    sb.append(line);
-//                    break;
-//                }
-//
-//                in.close();
-//                return sb.toString();
-//
-//            } else {
-//                return new String("false : " + responseCode);
-//            }
-//        } catch (Exception e) {
-//            return new String("Exception: " + e.getMessage());
-//        }
-//    }
-//
-//    @Override
-//    protected void onPostExecute(String result) {
-//        //Toast.makeText(getApplicationContext(), result,
-//        //Toast.LENGTH_LONG).show();
-//        Log.d("onPostExecute: ", result);
-//        translatedStr = result;
-//
-//    }
-//
-//}
-//
-//    public String getTranslatedStr(){
-//        return translatedStr;
-//    }
-//
-//
-//}
+package com.pethoalpar.androidtesstwoocr;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class TranslationUtils{
+    private static final String TAG = "TranslationUtils";
+    private static Context mContext;
+    private static TranslationUtils mInstance;
+    private TranslationUtils(Context context){
+        mContext=context;
+    }
+    public static TranslationUtils getInstance(Context context){
+        if(mInstance==null)
+            mInstance=new TranslationUtils(context);
+        return mInstance;
+    }
+
+    public  String[]  getTranslation(final String scannedTxt){
+         final String[] translation=new String[1];
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                Endpoints.TRANSLATION_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "onPostExecute tr "+response);
+                        translation[0]=response;
+                        Log.d(TAG, "getTranslation: after response "+translation[0]);
+
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "onErrorResponse: starts "+error.toString());
+
+                        // Toast.makeText(mContext, "unknown error  error is  "+error.toString(), Toast.LENGTH_LONG).show();
+
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Log.d(TAG, "getParams: starts with "+scannedTxt);
+
+
+                Map<String, String> params = new HashMap<>();
+                params.put("scannedText", scannedTxt);
+
+
+                return params;
+            }
+
+        };
+
+
+        Log.d(TAG, "getTranslation: before return "+translation[0]);
+        RequestHandler.getInstance(mContext).addToRequestQueue(stringRequest);
+        Log.d(TAG, "getTranslation: return "+translation[0]);
+        return translation;
+
+    }
+
+
+    public void getTranslationResponse(final String scannedTxt, final VolleyCallback callback) {
+
+
+
+        StringRequest strreq = new StringRequest(Request.Method.POST,
+                Endpoints.TRANSLATION_URL,
+                new Response.Listener < String > () {
+
+            @Override
+            public void onResponse(String Response) {
+                callback.onSuccessResponse(Response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "onErrorResponse: starts "+error.toString());
+
+                // Toast.makeText(mContext, "unknown error  error is  "+error.toString(), Toast.LENGTH_LONG).show();
+
+            }
+        }
+        ){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Log.d(TAG, "getParams: starts with "+scannedTxt);
+
+
+                Map<String, String> params = new HashMap<>();
+                params.put("scannedText", scannedTxt);
+
+
+                return params;
+            }
+        };
+        RequestHandler.getInstance(mContext).addToRequestQueue(strreq);
+    }
+
+}

@@ -34,6 +34,7 @@ public class OcrUtils {
     public static String getText(Bitmap bitmap){
         String retStr = "No result";
         if(mTessBaseAPI!=null){
+            Log.d(TAG, "getText: tess ! null");
             try{
                 mTessBaseAPI.setImage(bitmap);
             }catch (Exception e){
